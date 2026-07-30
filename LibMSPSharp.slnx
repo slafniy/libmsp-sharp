@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="LibMSP/LibMSP.csproj" />
+  <Project Path="TestApp/TestApp.csproj" />
+</Solution>
