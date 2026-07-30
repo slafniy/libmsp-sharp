@@ -2,7 +2,7 @@
 LibMSP is a C# wrapper for native [libmsp](https://github.com/slafniy/libmsp)
 
 ### How to use
-Copy [LibMSP.sh](LibMSPSharp/LibMSP.cs) to your project.
+Copy [LibMSP.cs](LibMSPSharp/LibMSP.cs) to your project.
 Build or get [libmsp.so](https://github.com/slafniy/libmsp) and place it somewhere.
 
 Use like this:
