@@ -2,7 +2,7 @@
 
 set -e
 
-VERSION="1.0.7"
+VERSION="0.0.4"
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "$0")" && pwd)
 
