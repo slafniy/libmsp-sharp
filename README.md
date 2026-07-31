@@ -12,7 +12,7 @@ Use like this:
 using LibMSPSharp;
 
 // "using" helps to free inner resources and do not wait object desctruction and GC
-using var player = new LibMSP("./libmsp.so");
+using var player = new LibMSP();
 
 // Play a song
 player.Play("./song.mp3");
