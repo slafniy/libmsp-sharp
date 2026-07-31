@@ -33,6 +33,10 @@ public sealed partial class LibMSP : IDisposable {
         return LibMSPInternal.Play(filePath);
     }
 
+    public bool TogglePause() {
+        return LibMSPInternal.TogglePause();
+    }
+    
     /// <summary>
     /// Opens file, reads its metadata.
     /// Returns a dictionary where keys are requested metadata keys. Values could be null.
@@ -82,6 +86,9 @@ public sealed partial class LibMSP : IDisposable {
         _disposed = true;
     }
 
+    /// <summary>
+    /// This is actual native library bindings class. Made private to hide any unmanaged code from user.
+    /// </summary>
     private static partial class LibMSPInternal {
         public static string? LibraryPath;
         private const string LibraryName = "libmsp";
@@ -110,6 +117,10 @@ public sealed partial class LibMSP : IDisposable {
         [return: MarshalAs(UnmanagedType.I1)]
         public static partial bool Play([MarshalAs(UnmanagedType.LPUTF8Str)] string fileName);
 
+        [LibraryImport(LibraryName, EntryPoint = "msp_toggle_pause")]
+        [return: MarshalAs(UnmanagedType.I1)]
+        public static partial bool TogglePause();
+        
         [LibraryImport(LibraryName, EntryPoint = "msp_get_metadata")]
         public static partial nint GetMetadata(
             [MarshalAs(UnmanagedType.LPUTF8Str)]
