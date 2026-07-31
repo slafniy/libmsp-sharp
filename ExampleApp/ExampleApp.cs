@@ -9,6 +9,8 @@ foreach ((string k, string? v) in player.GetMetadata(args[1], ["artist", "title"
 Console.WriteLine();
 
 player.Play(args[1]);
+Thread.Sleep(100);
+Console.WriteLine($"Total duration: {player.GetDurationMs()} ms");
 Thread.Sleep(2000);
 player.TogglePause();
 Thread.Sleep(2000);
@@ -16,10 +18,13 @@ player.SetVolume(0.5f);
 Thread.Sleep(2000);
 player.TogglePause();
 player.SetPosition(24032);
-Console.WriteLine($"Current playback pos: {player.GetPositionMs()}");
+Console.WriteLine($"Current playback pos: {player.GetPositionMs()} ms");
 Thread.Sleep(3000);
-Console.WriteLine($"Current playback pos: {player.GetPositionMs()}");
+Console.WriteLine($"Current playback pos: {player.GetPositionMs()} ms");
 player.Stop();
+Thread.Sleep(50);
+Console.WriteLine($"Total duration: {player.GetDurationMs()} ms");
+Thread.Sleep(100);
 player.Play(args[1]);
 player.SetVolume(0.91f);
 Thread.Sleep(3000);

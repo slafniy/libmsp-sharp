@@ -29,22 +29,32 @@ public sealed partial class LibMSP : IDisposable {
         DeinitNative();
     }
 
+    [SuppressMessage("Performance", "CA1822:Mark members as static")]
+    // ReSharper disable once MemberCanBeMadeStatic.Global
     public bool Play(string filePath) {
         return LibMSPInternal.Play(filePath);
     }
 
+    [SuppressMessage("Performance", "CA1822:Mark members as static")]
+    // ReSharper disable once MemberCanBeMadeStatic.Global
     public bool TogglePause() {
         return LibMSPInternal.TogglePause();
     }
 
+    [SuppressMessage("Performance", "CA1822:Mark members as static")]
+    // ReSharper disable once MemberCanBeMadeStatic.Global
     public bool Stop() {
         return LibMSPInternal.Stop();
     }
 
+    [SuppressMessage("Performance", "CA1822:Mark members as static")]
+    // ReSharper disable once MemberCanBeMadeStatic.Global
     public bool SetVolume(float volume) {
         return LibMSPInternal.SetVolume(volume);
     }
 
+    [SuppressMessage("Performance", "CA1822:Mark members as static")]
+    // ReSharper disable once MemberCanBeMadeStatic.Global
     public bool SetPosition(uint positionMs) {
         return LibMSPInternal.SetPosition(positionMs);
     }
@@ -53,11 +63,24 @@ public sealed partial class LibMSP : IDisposable {
     /// Get current playback position.
     /// </summary>
     /// <returns>Position in milliseconds, or null if it cannot obtain</returns>
+    [SuppressMessage("Performance", "CA1822:Mark members as static")]
+    // ReSharper disable once MemberCanBeMadeStatic.Global
     public uint? GetPositionMs() {
         long pos = LibMSPInternal.GetPosition();
         return pos < 0 ? null : (uint)pos;
     }
-    
+
+    /// <summary>
+    /// Get current track total duration
+    /// </summary>
+    /// <returns>Duration in milliseconds, null if it cannot obtain</returns>
+    [SuppressMessage("Performance", "CA1822:Mark members as static")]
+    // ReSharper disable once MemberCanBeMadeStatic.Global
+    public uint? GetDurationMs() {
+        long dur = LibMSPInternal.GetDuration();
+        return dur < 0 ? null : (uint)dur;
+    }
+
     /// <summary>
     /// Opens file, reads its metadata.
     /// Returns a dictionary where keys are requested metadata keys. Values could be null.
@@ -150,21 +173,25 @@ public sealed partial class LibMSP : IDisposable {
         [LibraryImport(LibraryName, EntryPoint = "msp_stop")]
         [return: MarshalAs(UnmanagedType.I1)]
         public static partial bool Stop();
-        
+
         // bool msp_set_volume(float volume);
         [LibraryImport(LibraryName, EntryPoint = "msp_set_volume")]
         [return: MarshalAs(UnmanagedType.I1)]
         public static partial bool SetVolume(float volume);
-        
+
         // bool msp_set_position(uint32_t position_ms);
         [LibraryImport(LibraryName, EntryPoint = "msp_set_position")]
         [return: MarshalAs(UnmanagedType.I1)]
         public static partial bool SetPosition(uint positionMs);
-        
+
         // int64_t msp_get_position();
         [LibraryImport(LibraryName, EntryPoint = "msp_get_position")]
         public static partial long GetPosition();
-        
+
+        // int64_t msp_get_duration();
+        [LibraryImport(LibraryName, EntryPoint = "msp_get_duration")]
+        public static partial long GetDuration();
+
         // char **msp_get_metadata(const char *filename, const char **keys, uint64_t keys_count);
         [LibraryImport(LibraryName, EntryPoint = "msp_get_metadata")]
         public static partial nint GetMetadata(
