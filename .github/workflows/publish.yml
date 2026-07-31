@@ -24,7 +24,7 @@ jobs:
       - name: Pack
         run: dotnet pack LibMSPSharp/LibMSPSharp.csproj -c Release
 
-      - name: Push to NuGet
-        uses: keybase/action-nuget-publisher@v1
-        with:
-          nupkg-path: 'LibMSPSharp/bin/Release/*.nupkg'
+      - name: Push to NuGet.org
+        run: |
+          dotnet nuget push LibMSPSharp/bin/Release/*.nupkg \
+            --source https://api.nuget.org/v3/index.json
