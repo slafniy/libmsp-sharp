@@ -28,6 +28,6 @@ player.Stop();
 Thread.Sleep(50);
 Console.WriteLine($"Total duration: {player.GetDurationMs()} ms");
 Thread.Sleep(100);
-player.Play(args[1]);
+player.Play(args[0]);
 player.SetVolume(0.91f);
 Thread.Sleep(3000);
