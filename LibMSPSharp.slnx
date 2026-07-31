@@ -1,4 +1,4 @@
 <Solution>
+  <Project Path="ExampleApp\ExampleApp.csproj" />
   <Project Path="LibMSPSharp\LibMSPSharp.csproj" />
-  <Project Path="TestApp/TestApp.csproj" />
 </Solution>
