@@ -48,6 +48,15 @@ public sealed partial class LibMSP : IDisposable {
     public bool SetPosition(uint positionMs) {
         return LibMSPInternal.SetPosition(positionMs);
     }
+
+    /// <summary>
+    /// Get current playback position.
+    /// </summary>
+    /// <returns>Position in milliseconds, or null if it cannot obtain</returns>
+    public uint? GetPositionMs() {
+        long pos = LibMSPInternal.GetPosition();
+        return pos < 0 ? null : (uint)pos;
+    }
     
     /// <summary>
     /// Opens file, reads its metadata.
@@ -151,6 +160,10 @@ public sealed partial class LibMSP : IDisposable {
         [LibraryImport(LibraryName, EntryPoint = "msp_set_position")]
         [return: MarshalAs(UnmanagedType.I1)]
         public static partial bool SetPosition(uint positionMs);
+        
+        // int64_t msp_get_position();
+        [LibraryImport(LibraryName, EntryPoint = "msp_get_position")]
+        public static partial long GetPosition();
         
         // char **msp_get_metadata(const char *filename, const char **keys, uint64_t keys_count);
         [LibraryImport(LibraryName, EntryPoint = "msp_get_metadata")]
