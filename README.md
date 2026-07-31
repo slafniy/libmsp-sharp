@@ -1,3 +1,5 @@
+[![Publish NuGet package](https://github.com/slafniy/libmsp-sharp/actions/workflows/build_nuget.yml/badge.svg?branch=master&event=workflow_dispatch)](https://github.com/slafniy/libmsp-sharp/actions/workflows/build_nuget.yml)
+
 ### What it is
 LibMSP is a C# wrapper for native [libmsp](https://github.com/slafniy/libmsp)
 
