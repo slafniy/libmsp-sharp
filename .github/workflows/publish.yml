@@ -1,1 +1,30 @@
-#
+name: Publish to NuGet.org
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Pack
+        run: dotnet pack LibMSPSharp/LibMSPSharp.csproj -c Release
+
+      - name: Push to NuGet
+        uses: keybase/action-nuget-publisher@v1
+        with:
+          nupkg-path: 'LibMSPSharp/bin/Release/*.nupkg'

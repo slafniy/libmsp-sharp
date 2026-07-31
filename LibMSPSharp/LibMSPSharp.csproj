@@ -8,6 +8,7 @@
         <PackageId>slafniy.LibMSPSharp</PackageId>
         <Authors>slafniy</Authors>
         <RepositoryUrl>https://github.com/slafniy/libmsp-sharp</RepositoryUrl>
+        <Version>1.0.2</Version>
     </PropertyGroup>
 
 </Project>
