@@ -1,0 +1,47 @@
+name: Publish NuGet package
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "NuGet package version"
+        required: true
+        type: string
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-24.04
+    
+    permissions:
+      id-token: write  # enable GitHub OIDC token issuance for this job
+    
+    steps:
+      # Build
+      - name: Checkout
+          uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.107
+
+      - name: Build package
+        run: |
+          dotnet pack LibMSPSharp/LibMSPSharp.csproj \
+            -c Release \
+            -o artifacts \
+            /p:PackageVersion=${{ inputs.version || github.ref_name }}
+      
+      # Get a short-lived NuGet API key
+      - name: NuGet login (OIDC → temp API key)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: slafniy
+      
+      # Push the package
+      - name: NuGet push
+        run: dotnet nuget push artifacts/my-sdk.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
