@@ -9,14 +9,21 @@
         <Authors>slafniy</Authors>
         <RepositoryUrl>https://github.com/slafniy/libmsp-sharp</RepositoryUrl>
         <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-        <Version>0.0.1</Version>
+        <Version>0.0.3</Version>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>
-        <!-- For nuget packaging - place everything preserving paths -->
+        <!-- For nuget packaging - place native lib preserving path -->
         <None Include="runtimes/linux-x64/native/libmsp.so">
             <Pack>true</Pack>
             <PackagePath>runtimes/linux-x64/native/libmsp.so</PackagePath>
+        </None>
+
+        <!-- For nuget packaging - add README -->
+        <None Include="README.md">
+            <Pack>true</Pack>
+            <PackagePath>/</PackagePath>
         </None>
     </ItemGroup>
 
