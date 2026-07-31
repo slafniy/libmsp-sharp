@@ -8,6 +8,15 @@
         <PackageId>slafniy.LibMSPSharp</PackageId>
         <Authors>slafniy</Authors>
         <RepositoryUrl>https://github.com/slafniy/libmsp-sharp</RepositoryUrl>
+        <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     </PropertyGroup>
+
+    <ItemGroup>
+        <!-- For nuget packaging - place everything preserving paths -->
+        <None Include="runtimes/linux-x64/native/libmsp.so">
+            <Pack>true</Pack>
+            <PackagePath>runtimes/linux-x64/native/libmsp.so</PackagePath>
+        </None>
+    </ItemGroup>
 
 </Project>

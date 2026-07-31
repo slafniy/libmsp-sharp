@@ -8,7 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\LibMSPSharp\LibMSPSharp.csproj" />
+        <ProjectReference Include="..\LibMSPSharp\LibMSPSharp.csproj"/>
+        <None Include="../LibMSPSharp/runtimes/linux-x64/native/libmsp.so">
+            <Link>libmsp.so</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 </Project>

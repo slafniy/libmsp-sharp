@@ -18,12 +18,10 @@ public sealed partial class LibMSP : IDisposable {
     /// <summary>
     /// Initializes native libmsp
     /// </summary>
-    /// <param name="libMspNativePath">Path to native library, e.g. "./libmsp.so"</param>
     /// <exception cref="Exception">Cannot initialize native library</exception>
-    public LibMSP(string libMspNativePath) {
-        LibMSPInternal.LibraryPath = libMspNativePath;
+    public LibMSP() {
         if (!LibMSPInternal.Init()) {
-            throw new InvalidOperationException($"Failed to initialize {libMspNativePath}");
+            throw new InvalidOperationException($"Failed to initialize libmsp");
         }
     }
 
@@ -152,21 +150,7 @@ public sealed partial class LibMSP : IDisposable {
     /// This is actual native library bindings class. Made private to hide any unmanaged code from user.
     /// </summary>
     private static partial class LibMSPInternal {
-        public static string? LibraryPath;
         private const string LibraryName = "libmsp";
-
-        static LibMSPInternal() {
-            NativeLibrary.SetDllImportResolver(typeof(LibMSPInternal).Assembly, DllImportResolver);
-        }
-
-        private static IntPtr DllImportResolver(string libraryName, Assembly assembly,
-            DllImportSearchPath? searchPath) {
-            if (libraryName == LibraryName && !string.IsNullOrWhiteSpace(LibraryPath)) {
-                return NativeLibrary.Load(LibraryPath);
-            }
-
-            return IntPtr.Zero;
-        }
 
         // bool msp_init(void);
         [LibraryImport(LibraryName, EntryPoint = "msp_init")]
