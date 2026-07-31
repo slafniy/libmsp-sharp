@@ -36,6 +36,10 @@ public sealed partial class LibMSP : IDisposable {
     public bool TogglePause() {
         return LibMSPInternal.TogglePause();
     }
+
+    public bool Stop() {
+        return LibMSPInternal.Stop();
+    }
     
     /// <summary>
     /// Opens file, reads its metadata.
@@ -120,6 +124,10 @@ public sealed partial class LibMSP : IDisposable {
         [LibraryImport(LibraryName, EntryPoint = "msp_toggle_pause")]
         [return: MarshalAs(UnmanagedType.I1)]
         public static partial bool TogglePause();
+
+        [LibraryImport(LibraryName, EntryPoint = "msp_stop")]
+        [return: MarshalAs(UnmanagedType.I1)]
+        public static partial bool Stop();
         
         [LibraryImport(LibraryName, EntryPoint = "msp_get_metadata")]
         public static partial nint GetMetadata(

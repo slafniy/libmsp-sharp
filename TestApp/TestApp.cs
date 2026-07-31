@@ -14,3 +14,6 @@ player.TogglePause();
 Thread.Sleep(2000);
 player.TogglePause();
 Thread.Sleep(2000);
+player.Stop();
+player.Play(args[1]);
+Thread.Sleep(3000);
