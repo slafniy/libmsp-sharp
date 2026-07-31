@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -e
+
+VERSION="1.0.1"
+
+SCRIPT_DIR=$(cd -- "$(dirname -- "$0")" && pwd)
+
+dotnet pack LibMSPSharp/LibMSPSharp.csproj -c Release /p:Version="${VERSION}"
+
+dotnet nuget push "${SCRIPT_DIR}/LibMSPSharp/bin/Release/slafniy.LibMSPSharp.${VERSION}.nupkg" \
+  --source "https://nuget.pkg.github.com/slafniy/index.json" \
+  --api-key $(secret-tool lookup github nuget)
