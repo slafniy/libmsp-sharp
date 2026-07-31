@@ -30,10 +30,11 @@ jobs:
 
       - name: Build package
         run: |
+          VERSION=${GITHUB_REF_NAME#v}
           dotnet pack LibMSPSharp/LibMSPSharp.csproj \
             -c Release \
             -o artifacts \
-            /p:PackageVersion=${{ inputs.version || github.ref_name }}
+            /p:PackageVersion=$VERSION
       
       # Get a short-lived NuGet API key
       - name: NuGet login (OIDC → temp API key)
