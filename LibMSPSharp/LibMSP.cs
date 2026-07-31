@@ -44,6 +44,10 @@ public sealed partial class LibMSP : IDisposable {
     public bool SetVolume(float volume) {
         return LibMSPInternal.SetVolume(volume);
     }
+
+    public bool SetPosition(uint positionMs) {
+        return LibMSPInternal.SetPosition(positionMs);
+    }
     
     /// <summary>
     /// Opens file, reads its metadata.
@@ -142,6 +146,11 @@ public sealed partial class LibMSP : IDisposable {
         [LibraryImport(LibraryName, EntryPoint = "msp_set_volume")]
         [return: MarshalAs(UnmanagedType.I1)]
         public static partial bool SetVolume(float volume);
+        
+        // bool msp_set_position(uint32_t position_ms);
+        [LibraryImport(LibraryName, EntryPoint = "msp_set_position")]
+        [return: MarshalAs(UnmanagedType.I1)]
+        public static partial bool SetPosition(uint positionMs);
         
         // char **msp_get_metadata(const char *filename, const char **keys, uint64_t keys_count);
         [LibraryImport(LibraryName, EntryPoint = "msp_get_metadata")]
