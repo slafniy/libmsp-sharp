@@ -7,6 +7,14 @@ namespace LibMSPSharp;
 public sealed partial class LibMSP : IDisposable {
     private bool _disposed; // to avoid double-free in the native part
 
+    public enum Status {
+        Uninitialized,
+        Idle,
+        Playing,
+        Paused,
+        Error
+    }
+
     /// <summary>
     /// Initializes native libmsp
     /// </summary>
@@ -79,6 +87,16 @@ public sealed partial class LibMSP : IDisposable {
     public uint? GetDurationMs() {
         long dur = LibMSPInternal.GetDuration();
         return dur < 0 ? null : (uint)dur;
+    }
+
+    /// <summary>
+    /// Gets current playback status.
+    /// </summary>
+    /// <returns>LibMSP.Status enum value</returns>
+    [SuppressMessage("Performance", "CA1822:Mark members as static")]
+    // ReSharper disable once MemberCanBeMadeStatic.Global
+    public Status GetStatus() {
+        return (Status)LibMSPInternal.GetStatus();
     }
 
     /// <summary>
@@ -191,6 +209,17 @@ public sealed partial class LibMSP : IDisposable {
         // int64_t msp_get_duration();
         [LibraryImport(LibraryName, EntryPoint = "msp_get_duration")]
         public static partial long GetDuration();
+
+        // player_status_t msp_get_status();
+        /* typedef enum {
+            MSP_STATUS_UNINITIALIZED = 0, // special case to return when the context does not exist yet/anymore
+            MSP_STATUS_IDLE,
+            MSP_STATUS_PLAYING,
+            MSP_STATUS_PAUSED,
+            MSP_STATUS_ERROR
+        } player_status_t; */
+        [LibraryImport(LibraryName, EntryPoint = "msp_get_status")]
+        public static partial int GetStatus();
 
         // char **msp_get_metadata(const char *filename, const char **keys, uint64_t keys_count);
         [LibraryImport(LibraryName, EntryPoint = "msp_get_metadata")]
