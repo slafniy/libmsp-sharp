@@ -40,6 +40,10 @@ public sealed partial class LibMSP : IDisposable {
     public bool Stop() {
         return LibMSPInternal.Stop();
     }
+
+    public bool SetVolume(float volume) {
+        return LibMSPInternal.SetVolume(volume);
+    }
     
     /// <summary>
     /// Opens file, reads its metadata.
@@ -110,25 +114,36 @@ public sealed partial class LibMSP : IDisposable {
             return IntPtr.Zero;
         }
 
+        // bool msp_init(void);
         [LibraryImport(LibraryName, EntryPoint = "msp_init")]
         [return: MarshalAs(UnmanagedType.I1)]
         public static partial bool Init();
 
+        // void msp_deinit(void);
         [LibraryImport(LibraryName, EntryPoint = "msp_deinit")]
         public static partial void Deinit();
 
+        // bool msp_play(const char *filename);
         [LibraryImport(LibraryName, EntryPoint = "msp_play")]
         [return: MarshalAs(UnmanagedType.I1)]
         public static partial bool Play([MarshalAs(UnmanagedType.LPUTF8Str)] string fileName);
 
+        // bool msp_toggle_pause(void);
         [LibraryImport(LibraryName, EntryPoint = "msp_toggle_pause")]
         [return: MarshalAs(UnmanagedType.I1)]
         public static partial bool TogglePause();
 
+        // bool msp_stop(void);
         [LibraryImport(LibraryName, EntryPoint = "msp_stop")]
         [return: MarshalAs(UnmanagedType.I1)]
         public static partial bool Stop();
         
+        // bool msp_set_volume(float volume);
+        [LibraryImport(LibraryName, EntryPoint = "msp_set_volume")]
+        [return: MarshalAs(UnmanagedType.I1)]
+        public static partial bool SetVolume(float volume);
+        
+        // char **msp_get_metadata(const char *filename, const char **keys, uint64_t keys_count);
         [LibraryImport(LibraryName, EntryPoint = "msp_get_metadata")]
         public static partial nint GetMetadata(
             [MarshalAs(UnmanagedType.LPUTF8Str)]
@@ -137,6 +152,7 @@ public sealed partial class LibMSP : IDisposable {
             string[] keys,
             ulong keysCount);
 
+        // void msp_free_metadata_result(char **values, uint64_t keys_count);
         [LibraryImport(LibraryName, EntryPoint = "msp_free_metadata_result")]
         public static partial void FreeMetadataResult(nint values, ulong keysCount);
     }
