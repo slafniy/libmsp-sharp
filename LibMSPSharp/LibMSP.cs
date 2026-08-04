@@ -1,11 +1,11 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace LibMSPSharp;
 
 public sealed partial class LibMSP : IDisposable {
     private bool _disposed; // to avoid double-free in the native part
+    private readonly nint _ctxHandle;
 
     public enum Status {
         Uninitialized,
@@ -20,8 +20,9 @@ public sealed partial class LibMSP : IDisposable {
     /// </summary>
     /// <exception cref="Exception">Cannot initialize native library</exception>
     public LibMSP() {
-        if (!LibMSPInternal.Init()) {
-            throw new InvalidOperationException($"Failed to initialize libmsp");
+        _ctxHandle = LibMSPInternal.Init();
+        if (_ctxHandle == IntPtr.Zero) {
+            throw new InvalidOperationException("Failed to initialize libmsp");
         }
     }
 
@@ -38,31 +39,31 @@ public sealed partial class LibMSP : IDisposable {
     [SuppressMessage("Performance", "CA1822:Mark members as static")]
     // ReSharper disable once MemberCanBeMadeStatic.Global
     public bool Play(string filePath) {
-        return LibMSPInternal.Play(filePath);
+        return LibMSPInternal.Play(_ctxHandle, filePath);
     }
 
     [SuppressMessage("Performance", "CA1822:Mark members as static")]
     // ReSharper disable once MemberCanBeMadeStatic.Global
     public bool TogglePause() {
-        return LibMSPInternal.TogglePause();
+        return LibMSPInternal.TogglePause(_ctxHandle);
     }
 
     [SuppressMessage("Performance", "CA1822:Mark members as static")]
     // ReSharper disable once MemberCanBeMadeStatic.Global
     public bool Stop() {
-        return LibMSPInternal.Stop();
+        return LibMSPInternal.Stop(_ctxHandle);
     }
 
     [SuppressMessage("Performance", "CA1822:Mark members as static")]
     // ReSharper disable once MemberCanBeMadeStatic.Global
     public bool SetVolume(float volume) {
-        return LibMSPInternal.SetVolume(volume);
+        return LibMSPInternal.SetVolume(_ctxHandle, volume);
     }
 
     [SuppressMessage("Performance", "CA1822:Mark members as static")]
     // ReSharper disable once MemberCanBeMadeStatic.Global
     public bool SetPosition(uint positionMs) {
-        return LibMSPInternal.SetPosition(positionMs);
+        return LibMSPInternal.SetPosition(_ctxHandle, positionMs);
     }
 
     /// <summary>
@@ -72,7 +73,7 @@ public sealed partial class LibMSP : IDisposable {
     [SuppressMessage("Performance", "CA1822:Mark members as static")]
     // ReSharper disable once MemberCanBeMadeStatic.Global
     public uint? GetPositionMs() {
-        long pos = LibMSPInternal.GetPosition();
+        long pos = LibMSPInternal.GetPosition(_ctxHandle);
         return pos < 0 ? null : (uint)pos;
     }
 
@@ -83,7 +84,7 @@ public sealed partial class LibMSP : IDisposable {
     [SuppressMessage("Performance", "CA1822:Mark members as static")]
     // ReSharper disable once MemberCanBeMadeStatic.Global
     public uint? GetDurationMs() {
-        long dur = LibMSPInternal.GetDuration();
+        long dur = LibMSPInternal.GetDuration(_ctxHandle);
         return dur < 0 ? null : (uint)dur;
     }
 
@@ -94,7 +95,7 @@ public sealed partial class LibMSP : IDisposable {
     [SuppressMessage("Performance", "CA1822:Mark members as static")]
     // ReSharper disable once MemberCanBeMadeStatic.Global
     public Status GetStatus() {
-        return (Status)LibMSPInternal.GetStatus();
+        return (Status)LibMSPInternal.GetStatus(_ctxHandle);
     }
 
     /// <summary>
@@ -141,8 +142,8 @@ public sealed partial class LibMSP : IDisposable {
     }
 
     private void DeinitNative() {
-        if (_disposed) return;
-        LibMSPInternal.Deinit();
+        if (_disposed || _ctxHandle == IntPtr.Zero) return;
+        LibMSPInternal.Deinit(_ctxHandle);
         _disposed = true;
     }
 
@@ -152,49 +153,48 @@ public sealed partial class LibMSP : IDisposable {
     private static partial class LibMSPInternal {
         private const string LibraryName = "libmsp";
 
-        // bool msp_init(void);
+        // playback_context_t *msp_init(void)
         [LibraryImport(LibraryName, EntryPoint = "msp_init")]
-        [return: MarshalAs(UnmanagedType.I1)]
-        public static partial bool Init();
+        public static partial nint Init();
 
-        // void msp_deinit(void);
+        // void msp_deinit(playback_context_t *ctx);
         [LibraryImport(LibraryName, EntryPoint = "msp_deinit")]
-        public static partial void Deinit();
+        public static partial void Deinit(nint ctxHandle);
 
-        // bool msp_play(const char *filename);
+        // bool msp_play(const playback_context_t *ctx, const char *filename);
         [LibraryImport(LibraryName, EntryPoint = "msp_play")]
         [return: MarshalAs(UnmanagedType.I1)]
-        public static partial bool Play([MarshalAs(UnmanagedType.LPUTF8Str)] string fileName);
+        public static partial bool Play(nint ctxHandle, [MarshalAs(UnmanagedType.LPUTF8Str)] string fileName);
 
-        // bool msp_toggle_pause(void);
+        // bool msp_toggle_pause(const playback_context_t *ctx);
         [LibraryImport(LibraryName, EntryPoint = "msp_toggle_pause")]
         [return: MarshalAs(UnmanagedType.I1)]
-        public static partial bool TogglePause();
+        public static partial bool TogglePause(nint ctxHandle);
 
-        // bool msp_stop(void);
+        // bool msp_stop(const playback_context_t *ctx);
         [LibraryImport(LibraryName, EntryPoint = "msp_stop")]
         [return: MarshalAs(UnmanagedType.I1)]
-        public static partial bool Stop();
+        public static partial bool Stop(nint ctxHandle);
 
-        // bool msp_set_volume(float volume);
+        // bool msp_set_volume(const playback_context_t *ctx, float volume);
         [LibraryImport(LibraryName, EntryPoint = "msp_set_volume")]
         [return: MarshalAs(UnmanagedType.I1)]
-        public static partial bool SetVolume(float volume);
+        public static partial bool SetVolume(nint ctxHandle, float volume);
 
-        // bool msp_set_position(uint32_t position_ms);
+        // bool msp_set_position(const playback_context_t *ctx, uint32_t position_ms);
         [LibraryImport(LibraryName, EntryPoint = "msp_set_position")]
         [return: MarshalAs(UnmanagedType.I1)]
-        public static partial bool SetPosition(uint positionMs);
+        public static partial bool SetPosition(nint ctxHandle, uint positionMs);
 
-        // int64_t msp_get_position();
+        // int64_t msp_get_position(const playback_context_t *ctx);
         [LibraryImport(LibraryName, EntryPoint = "msp_get_position")]
-        public static partial long GetPosition();
+        public static partial long GetPosition(nint ctxHandle);
 
-        // int64_t msp_get_duration();
+        // int64_t msp_get_duration(const playback_context_t *ctx);
         [LibraryImport(LibraryName, EntryPoint = "msp_get_duration")]
-        public static partial long GetDuration();
+        public static partial long GetDuration(nint ctxHandle);
 
-        // player_status_t msp_get_status();
+        // player_status_t msp_get_status(const playback_context_t *ctx);
         /* typedef enum {
             MSP_STATUS_UNINITIALIZED = 0, // special case to return when the context does not exist yet/anymore
             MSP_STATUS_IDLE,
@@ -203,8 +203,17 @@ public sealed partial class LibMSP : IDisposable {
             MSP_STATUS_ERROR
         } player_status_t; */
         [LibraryImport(LibraryName, EntryPoint = "msp_get_status")]
-        public static partial int GetStatus();
+        public static partial int GetStatus(nint ctxHandle);
 
+        // typedef void (*player_status_callback_t)(player_status_t new_status, void *user_data);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void StatusChangeCallbackDelegate(int status, nint userData);
+        
+        // bool msp_register_on_status_change_callback(playback_context_t *ctx, player_status_callback_t callback, void *user_data);
+        [LibraryImport(LibraryName, EntryPoint = "msp_register_on_status_change_callback")]
+        [return: MarshalAs(UnmanagedType.I1)]
+        public static partial bool RegisterStatusChangeCallback(nint ctxHandle, StatusChangeCallbackDelegate cb, nint userData);
+        
         // char **msp_get_metadata(const char *filename, const char **keys, uint64_t keys_count);
         [LibraryImport(LibraryName, EntryPoint = "msp_get_metadata")]
         public static partial nint GetMetadata(
