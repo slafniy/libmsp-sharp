@@ -6,7 +6,10 @@ namespace LibMSPSharp;
 public sealed partial class LibMSP : IDisposable {
     private bool _disposed; // to avoid double-free in the native part
     private readonly nint _ctxHandle;
-
+    // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable - keep it to save from GC
+    private readonly LibMSPInternal.StatusChangeCallbackDelegate? _callbackDelegate;
+    public event Action<Status>? StatusChanged;
+    
     public enum Status {
         Uninitialized,
         Idle,
@@ -24,6 +27,9 @@ public sealed partial class LibMSP : IDisposable {
         if (_ctxHandle == IntPtr.Zero) {
             throw new InvalidOperationException("Failed to initialize libmsp");
         }
+
+        _callbackDelegate = OnStatusChangeCallback;
+        LibMSPInternal.RegisterStatusChangeCallback(_ctxHandle, _callbackDelegate, IntPtr.Zero);
     }
 
     public void Dispose() {
@@ -147,6 +153,11 @@ public sealed partial class LibMSP : IDisposable {
         _disposed = true;
     }
 
+    // typedef void (*player_status_callback_t)(player_status_t new_status, void *user_data);
+    private void OnStatusChangeCallback(int status, nint userData) {
+        StatusChanged?.Invoke((Status)status);
+    }
+    
     /// <summary>
     /// This is actual native library bindings class. Made private to hide any unmanaged code from user.
     /// </summary>
