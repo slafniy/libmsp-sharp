@@ -17,6 +17,7 @@ jobs:
     
     permissions:
       id-token: write  # enable GitHub OIDC token issuance for this job
+      contents: write
     
     steps:
       # Build
@@ -40,14 +41,23 @@ jobs:
             -o artifacts \
             /p:PackageVersion=$VERSION
       
+      # Attach nuget package to GitHub Release
+      - name: Upload to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/slafniy.LibMSPSharp.*.nupkg
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || format('v{0}', inputs.version) }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
       # Get a short-lived NuGet API key
       - name: NuGet login (OIDC → temp API key)
         uses: NuGet/login@v1
         id: login
         with:
           user: slafniy
-      
-      # Push the package
+
+      # Push the package to nuget.org
       - name: NuGet push
         run: |
           dotnet nuget push artifacts/slafniy.LibMSPSharp.*.nupkg \
