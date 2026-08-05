@@ -9,7 +9,7 @@
         <Authors>slafniy</Authors>
         <RepositoryUrl>https://github.com/slafniy/libmsp-sharp</RepositoryUrl>
         <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-        <Version>0.0.6</Version>
+        <Version>0.1.0</Version>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
