@@ -1,42 +1,80 @@
 ﻿using LibMSPSharp;
 
-using var player1 = new LibMSP();
-using var player2 = new LibMSP();
+// Using file paths provided as arguments for this example.
+// E.g. 
+// ./ExampleApp "/mnt/data/Music/Shylmagoghnar/2014 - Emergence/01. I Am the Abyss.mp3" \
+// "/mnt/data/Music/Be'lakor/2021 - Coherence/01 Locus.mp3"
+string song1 = args[0];
+string song2 = args[1];
 
-player1.StatusChanged += status => {
-    Console.WriteLine($"[player #1] STATUS CHANGED TO: {status}");
-};
-player2.StatusChanged += status => {
-    Console.WriteLine($"[player #2] STATUS CHANGED TO: {status}");
-}; 
+PrintMeta(song1); // see PrintMeta() code below, note is uses a static LibMSP.GetMetadata() method
+PrintMeta(song2);
+/* Expected output:
+artist: Shylmagoghnar; title: I Am the Abyss; album: Emergence; date: 2014;
+artist: Be'lakor; title: Locus; album: Coherence; date: 2021;
+ */
 
-foreach ((string k, string? v) in player1.GetMetadata(args[0], ["artist", "title", "album", "date"])) {
-    Console.Write($"{k}: {v}; ");
+// To use playback functionality, you need an instance of library.
+// Use "using" to help native backend free itself earlier, otherwise it won't do it till GC collects the object.
+using var player = new LibMSP();
+
+// you can create several instances of the library, and they will work independently:
+// using var player2 = new LibMSP();
+
+// to start playback just call
+player.Play(song1);
+
+// and wait some time to actually hear the song, because Play() does not block current thread while playing,
+// it just asks the background thread to open file and start playback.
+Thread.Sleep(2000);
+
+// to seek to some particular position use
+player.SetPosition(35000); // moves to the 35 sec point
+Thread.Sleep(2000);
+
+// if you want to move to some particular % of the song, get its duration first
+uint? duration = player.GetDurationMs();
+// and then use it like this, e.g. you want to seek to 55%:
+if (duration != null) { // it can be null e.g. if nothing's currently open
+    player.SetPosition((uint)(duration * 0.55));
 }
 
-Console.WriteLine();
+// you can always check the status
+Console.WriteLine(player.GetStatus());  // expected "Playing"
 
-Console.WriteLine($"Status: {player1.GetStatus()}");
-player1.Play(args[0]);
-player2.Play(args[0]);
-Thread.Sleep(100);
-Console.WriteLine($"Status: {player2.GetStatus()}");
-Console.WriteLine($"Total duration: {player1.GetDurationMs()} ms");
+// but there's more convenient way - use status events to react on status change
+// to subscribe on events:
+player.StatusChanged += status => {
+    Console.WriteLine($">>> player changed status to {status}");
+}; 
+
+// check it:
+player.TogglePause();
+player.TogglePause();
+player.Stop();
+player.Play(song2);
+player.SetPosition(12345);
+/* Expecting this
+>>> player changed status to Paused
+>>> player changed status to Playing
+>>> player changed status to Idle
+>>> player changed status to Playing
+>>> player changed status to Idle
+ */
+
 Thread.Sleep(2000);
-player1.TogglePause();
-Thread.Sleep(2000);
-Console.WriteLine($"Status: {player2.GetStatus()}");
-player2.SetVolume(0.5f);
-Thread.Sleep(2000);
-player1.TogglePause();
-player2.SetPosition(24032);
-Console.WriteLine($"Current playback pos: {player1.GetPositionMs()} ms");
-Thread.Sleep(3000);
-Console.WriteLine($"Current playback pos: {player2.GetPositionMs()} ms");
-player1.Stop();
-Thread.Sleep(50);
-Console.WriteLine($"Total duration: {player2.GetDurationMs()} ms");
-Thread.Sleep(100);
-player1.Play(args[0]);
-player2.SetVolume(0.91f);
-Thread.Sleep(3000);
+
+// to stop the playback (also closes the file) call this
+player.Stop();
+
+return;
+
+void PrintMeta(string songPath) {
+    // Don't need any initialization to extract metadata from the file
+    // There is no standard for keys, but the most common should work for every music file.
+    foreach ((string k, string? v) in LibMSP.GetMetadata(songPath, ["artist", "title", "album", "date"])) {
+        Console.Write($"{k}: {v}; ");
+    }
+
+    Console.WriteLine();
+}

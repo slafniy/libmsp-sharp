@@ -41,33 +41,23 @@ public sealed partial class LibMSP : IDisposable {
     ~LibMSP() {
         DeinitNative();
     }
-
-    [SuppressMessage("Performance", "CA1822:Mark members as static")]
-    // ReSharper disable once MemberCanBeMadeStatic.Global
+    
     public bool Play(string filePath) {
         return LibMSPInternal.Play(_ctxHandle, filePath);
     }
-
-    [SuppressMessage("Performance", "CA1822:Mark members as static")]
-    // ReSharper disable once MemberCanBeMadeStatic.Global
+    
     public bool TogglePause() {
         return LibMSPInternal.TogglePause(_ctxHandle);
     }
-
-    [SuppressMessage("Performance", "CA1822:Mark members as static")]
-    // ReSharper disable once MemberCanBeMadeStatic.Global
+    
     public bool Stop() {
         return LibMSPInternal.Stop(_ctxHandle);
     }
-
-    [SuppressMessage("Performance", "CA1822:Mark members as static")]
-    // ReSharper disable once MemberCanBeMadeStatic.Global
+    
     public bool SetVolume(float volume) {
         return LibMSPInternal.SetVolume(_ctxHandle, volume);
     }
-
-    [SuppressMessage("Performance", "CA1822:Mark members as static")]
-    // ReSharper disable once MemberCanBeMadeStatic.Global
+    
     public bool SetPosition(uint positionMs) {
         return LibMSPInternal.SetPosition(_ctxHandle, positionMs);
     }
@@ -76,8 +66,6 @@ public sealed partial class LibMSP : IDisposable {
     /// Get current playback position.
     /// </summary>
     /// <returns>Position in milliseconds, or null if it cannot obtain</returns>
-    [SuppressMessage("Performance", "CA1822:Mark members as static")]
-    // ReSharper disable once MemberCanBeMadeStatic.Global
     public uint? GetPositionMs() {
         long pos = LibMSPInternal.GetPosition(_ctxHandle);
         return pos < 0 ? null : (uint)pos;
@@ -87,8 +75,6 @@ public sealed partial class LibMSP : IDisposable {
     /// Get current track total duration
     /// </summary>
     /// <returns>Duration in milliseconds, null if it cannot obtain</returns>
-    [SuppressMessage("Performance", "CA1822:Mark members as static")]
-    // ReSharper disable once MemberCanBeMadeStatic.Global
     public uint? GetDurationMs() {
         long dur = LibMSPInternal.GetDuration(_ctxHandle);
         return dur < 0 ? null : (uint)dur;
@@ -98,8 +84,6 @@ public sealed partial class LibMSP : IDisposable {
     /// Gets current playback status.
     /// </summary>
     /// <returns>LibMSP.Status enum value</returns>
-    [SuppressMessage("Performance", "CA1822:Mark members as static")]
-    // ReSharper disable once MemberCanBeMadeStatic.Global
     public Status GetStatus() {
         return (Status)LibMSPInternal.GetStatus(_ctxHandle);
     }
@@ -113,9 +97,7 @@ public sealed partial class LibMSP : IDisposable {
     /// <returns>A dictionary where keys are requested metadata keys, passed as parameters.
     /// Values could be null</returns>
     /// <exception cref="ArgumentException">if keys count is zero</exception>
-    [SuppressMessage("Performance", "CA1822:Mark members as static")]
-    // ReSharper disable once MemberCanBeMadeStatic.Global - depends on native lib loading via constructor
-    public Dictionary<string, string?> GetMetadata(string fileName, string[] keys) {
+    public static Dictionary<string, string?> GetMetadata(string fileName, string[] keys) {
         if (keys.Length == 0) {
             throw new ArgumentException("You should provide at least one key to search");
         }
